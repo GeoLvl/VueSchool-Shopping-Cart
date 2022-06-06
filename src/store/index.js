@@ -8,15 +8,33 @@ export default new Vuex.Store({
   state: { // data
     products: [],
     // {id, qty}
+    cart: [],
+    checkoutStatus: null
 
   },
   getters: { // computed properties
-    productsCount() {
-      // ...
-    },
     availableProducts(state) {
       return state.products.filter(product => product.stock > 0)
     },
+
+    cartProducts(state) {
+      return state.cart.map(cartItem => {
+        const product = state.products.find(product => product.id === cartItem.id)
+        return {
+          title: product.title,
+          price: product.price,
+          quantity: cartItem.quantity
+        }
+      })
+    },
+
+    cartTotal(state, getters) {
+      let total = 0
+      getters.cartProducts.forEach(product => {
+        total += product.price * product.quantity
+      });
+      return total
+    }
   },
   mutations: {
     setProducts(state, products) {
@@ -35,8 +53,16 @@ export default new Vuex.Store({
       cartItem.quantity++
     },
 
-    decrementProductInventory (state, product) {
+    decrementProductStock (state, product) {
       product.stock--
+    },
+
+    setCheckoutStatuses (state, status) {
+      state.checkoutStatus = status
+    },
+
+    emptyCart(state) {
+      state.cart = []
     }
   },
   actions: { // methods
@@ -47,14 +73,15 @@ export default new Vuex.Store({
           shop.getProducts(products => {
             commit('setProducts', products)
             resolve()
-            reject()
+            reject() //weird
         }); 
       });          
     },
+
     addProductToCart (context, product) {
       if (product.stock > 0) {
         // find cartItem
-        const cartItem = context.state.find(item => item.id === product.id)
+        const cartItem = context.state.cart.find(item => item.id === product.id)
         if (!cartItem) {
           // pushProductToCart
           context.commit('pushProductToCart', product.id)
@@ -62,9 +89,21 @@ export default new Vuex.Store({
           // incrementItemQuantity
           context.commit('incrementItemQuantity', cartItem)
         }
-        context.commit('decrementProductInventory', product)
-      }
-      
+        context.commit('decrementProductStock', product)
+      }      
+    },
+
+    checkout({state, commit}) {
+      shop.buyProducts(
+        state.cart,
+        () => {
+          commit('emptyCart')
+          commit('setCheckoutStatus', 'success')
+        },
+        () => {
+          commit('setCheckoutStatus', 'fail')
+        }
+      )
     }
 
   },

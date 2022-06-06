@@ -4,8 +4,8 @@
         <img v-if="loading" src="https://i.imgur.com/JfPpwOA.gif" alt="loading">
         <ul v-else>
             <li v-for='product in products' :key="product.id">
-                {{ product.title }} - {{ product.price }} - {{ product.stock }}
-                <button @click="addProductToCart(product)">Add to cart</button>
+                {{ product.title }} - {{ product.price | currency }} - {{ product.stock }}
+                    <button @click="addProductToCart(product)">Add to cart</button>
                 </li>
         </ul>
     </div>
@@ -26,9 +26,9 @@
             }
         },
         methods: {
-            addProductToCart(product) {
-                this.$store.dispatch('addProductToCart', product)
-            }
+            addProductToCart (product) {
+            this.$store.dispatch('addProductToCart', product)
+      }
         },
         created() {
             this.loading = true

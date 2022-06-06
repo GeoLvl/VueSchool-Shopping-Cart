@@ -3,7 +3,7 @@
 const _products = [
     {"id": 1, "title": "Ipad 5 mini", "price": 490.90, "stock": 4},
     {"id": 2, "title": "Macbook Pro", "price": 2550.90, "stock": 8},
-    {"id": 3, "title": "Macbook Air", "price": 1775.90, "stock": 7}
+    {"id": 3, "title": "Macbook Air", "price": 1775.90, "stock": 5}
 ]
 
 export default {

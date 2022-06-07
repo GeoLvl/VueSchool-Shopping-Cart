@@ -34,6 +34,12 @@ export default new Vuex.Store({
         total += product.price * product.quantity
       });
       return total
+    },
+
+    productIsInStock() {
+      return (product) => {
+        return product.stock > 0
+      }
     }
   },
   mutations: {
